@@ -54,7 +54,15 @@ let generateScales = () => {
     .range([height - padding, padding]);
 };
 
-let drawBars = () => {};
+let drawBars = () => {
+  svg
+    .selectAll("rect")
+    .data(values) // associate data array with all rectangle values
+    .enter() // for each data value that does not have a rectangle
+    .append("rect") // create a rectangle
+    .attr("class", "bar")
+    .attr("width", width - (2 * padding) / values.length);
+};
 
 let generateAxes = () => {
   let xAxis = d3.axisBottom(xAxisScale);
