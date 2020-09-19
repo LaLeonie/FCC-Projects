@@ -23,7 +23,7 @@ let drawCanvas = () => {
 };
 
 let generateScales = () => {
-  // Create y and x axis
+  // Create y and x scales for translation
   heightScale = d3
     .scaleLinear()
     .domain([
@@ -47,7 +47,7 @@ let generateScales = () => {
     .domain([d3.min(datesArray), d3.max(datesArray)])
     .range([padding, width - padding]);
 
-  // Create scale for y axis
+  // Create scale for y axis to be drawn
   yAxisScale = d3
     .scaleLinear()
     .domain([0, d3.max(values, (item) => item[1])])
@@ -58,11 +58,19 @@ let drawBars = () => {};
 
 let generateAxes = () => {
   let xAxis = d3.axisBottom(xAxisScale);
+  let yAxis = d3.axisLeft(yAxisScale);
+
   svg
     .append("g")
     .call(xAxis)
     .attr("id", "x-axis")
     .attr("transform", "translate(0," + (height - padding) + ")");
+
+  svg
+    .append("g")
+    .call(yAxis)
+    .attr("id", "y-axis")
+    .attr("transform", "translate(" + padding + ",0)");
 };
 
 // EXECUTION
