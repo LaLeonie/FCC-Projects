@@ -67,7 +67,8 @@ let drawBars = () => {
     .attr("height", (item) => heightScale(item[1]))
     .attr("x", (item, index) => {
       return xScale(index);
-    });
+    })
+    .attr("y", (item) => height - padding - heightScale(item[1]));
 };
 
 let generateAxes = () => {
