@@ -61,7 +61,9 @@ let drawBars = () => {
     .enter() // for each data value that does not have a rectangle
     .append("rect") // create a rectangle
     .attr("class", "bar")
-    .attr("width", width - (2 * padding) / values.length);
+    .attr("width", width - (2 * padding) / values.length)
+    .attr("data-date", (item) => item[0])
+    .attr("data-gdp", (item) => item[1]);
 };
 
 let generateAxes = () => {
