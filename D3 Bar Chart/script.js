@@ -1,10 +1,6 @@
 // SETUP
 let url =
   "https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/master/GDP-data.json";
-let req = new XMLHttpRequest();
-
-let data;
-let values = [];
 
 let heightScale;
 let xScale;
@@ -55,12 +51,21 @@ let generateScales = () => {
 };
 
 let drawBars = () => {
+  let tooltip = d3
+    .select("body")
+    .append("div")
+    .attr("id", "tooltip")
+    .style("visibility", "hidden")
+    .style("width", "auto")
+    .style("height", "auto");
+
   svg
     .selectAll("rect")
     .data(values) // associate data array with all rectangle values
     .enter() // for each data value that does not have a rectangle
     .append("rect") // create a rectangle
     .attr("class", "bar")
+    .attr("height", 0)
     .attr("width", (width - 2 * padding) / values.length)
     .attr("data-date", (item) => item[0])
     .attr("data-gdp", (item) => item[1])
@@ -68,7 +73,15 @@ let drawBars = () => {
     .attr("x", (item, index) => {
       return xScale(index);
     })
-    .attr("y", (item) => height - padding - heightScale(item[1]));
+    .attr("y", (item) => height - padding - heightScale(item[1]))
+    .on("mouseover", (item) => {
+      tooltip.transition().style("visibility", "visible");
+      tooltip.text(item[0]);
+      document.querySelector("#tooltip").setAttribute("data-date", item[0]);
+    })
+    .on("mouseout", (item) => {
+      tooltip.transition().style("visibilty", "hidden");
+    });
 };
 
 let generateAxes = () => {
@@ -88,16 +101,20 @@ let generateAxes = () => {
     .attr("transform", "translate(" + padding + ",0)");
 };
 
-// EXECUTION
-// create JS object from data
-req.open("GET", url, true);
-req.onload = () => {
-  data = JSON.parse(req.responseText);
+let update = () => {
+  d3.selectAll(".bar")
+    .attr("fill", "black")
+    .transition()
+    .duration(5000)
+    .attr("fill", "green");
+};
+
+d3.json("/data.json").then(function (data) {
+  console.log("data", data.data);
   values = data.data;
-  console.log(values);
   drawCanvas();
   generateScales();
   drawBars();
   generateAxes();
-};
-req.send();
+  update();
+});

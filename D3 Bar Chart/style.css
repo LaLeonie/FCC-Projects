@@ -3,8 +3,20 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  background-color: lighgrey;
 }
 
 svg {
-  background-color: wheat;
+}
+
+svg rect {
+  fill: steelblue;
+}
+
+svg rect:hover {
+  fill: orange;
+}
+
+.axis {
+  font: 15px Arial sans-serif;
 }
