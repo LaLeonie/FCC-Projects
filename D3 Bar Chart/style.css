@@ -1,22 +1,63 @@
+@import url("https://fonts.googleapis.com/css?family=Lato");
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 body {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background-color: lighgrey;
+  min-height: 100vh;
+  width: 100%;
+  font-family: "Lato", sans-serif;
+  color: #eee;
+  background: #252525;
 }
 
-svg {
+.container {
+  /* set the size of the container 
+  as the SVG defines only the viewbox attribute, the width spreads to fit the container's width
+  the height is also defined by the viewbox itself, to preserve the width to height ratio */
+  width: 85vw;
+  padding: 1rem;
+  margin: 2rem auto;
+  color: #252525;
+  background: whitesmoke;
+}
+.container h1#title {
+  font-size: 2.5rem;
+  text-transform: capitalize;
+  text-align: center;
+  margin: 1rem;
+}
+.container h1#title::selection {
+  color: #eee;
+  background: #252525;
 }
 
-svg rect {
-  fill: steelblue;
+/* change the font for the ticks of the axes */
+.container svg text {
+  font-family: "Lato", sans-serif;
+  font-weight: bold;
 }
-
-svg rect:hover {
+/* change the opacity of the fill on hover */
+.container svg .bar {
+  fill: rgba(58, 49, 38, 0.7);
+}
+.container svg .bar:hover {
   fill: orange;
 }
-
-.axis {
-  font: 15px Arial sans-serif;
+.container div#tooltip {
+  /* absolute position the div used as tooltip, to change the left and bottom properties as the cursor hovers on the SVG rectangles */
+  position: absolute;
+  border-radius: 4px;
+  color: black;
+  background: orange;
+  padding: 1rem 2rem;
+  font-size: 1.5rem;
+  font-weight: bold;
+  /* pointer events to avoid hovering on the tooltip and preventing the hover state on the rectangle elements behind it */
+  pointer-events: none;
+  /* set opacity to 0 and change it to 1 on hover on the rectangle elements */
+  opacity: 0;
+  /* transition to smoothen the change in opacity  */
+  transition: opacity 0.2s ease-out;
 }

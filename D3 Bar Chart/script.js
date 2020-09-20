@@ -1,120 +1,129 @@
+/* SETUP steps
+ * select svg tag and assign to variable
+ * Define position and size of canvas and position content
+ * Define scales
+ * Define functions to handle/convert times
+ */
+
 // SETUP
 let url =
   "https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/master/GDP-data.json";
 
-let heightScale;
-let xScale;
-let xAxisScale;
-let yAxisScale;
-
-let width = 800;
-let height = 600;
-let padding = 40;
-
 let svg = d3.select("svg");
+let container = d3.select(".container");
 
-let drawCanvas = () => {
-  svg.attr("width", width);
-  svg.attr("height", height);
+const margin = {
+  top: 20,
+  right: 20,
+  bottom: 20,
+  left: 50,
 };
 
-let generateScales = () => {
-  // Create y and x scales for translation
-  heightScale = d3
-    .scaleLinear()
-    .domain([
-      0,
-      d3.max(values, (item) => {
-        return item[1];
-      }),
-    ])
-    .range([0, height - 2 * padding]);
+// width and height of vizualisation is canvas size - margin
+const width = 800 - margin.left - margin.right,
+  height = 400 - margin.top - margin.bottom;
 
-  xScale = d3
-    .scaleLinear()
-    .domain([0, values.length - 1])
-    .range([padding, width - padding]);
+// define position and size of svg canvas
+const containerCanvas = svg.attr(
+  "viewBox",
+  `0 0 ${width + margin.left + margin.right}  ${
+    height + margin.top + margin.bottom
+  }`
+);
 
-  // Create scale for x axis to be drawn
-  let datesArray = values.map((item) => new Date(item[0]));
-  console.log(datesArray);
-  xAxisScale = d3
-    .scaleTime()
-    .domain([d3.min(datesArray), d3.max(datesArray)])
-    .range([padding, width - padding]);
+// create subcanvas for content and define position
+const canvasContents = containerCanvas
+  .append("g")
+  .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-  // Create scale for y axis to be drawn
-  yAxisScale = d3
-    .scaleLinear()
-    .domain([0, d3.max(values, (item) => item[1])])
-    .range([height - padding, padding]);
-};
+// Create scales
+const xScale = d3.scaleTime().range([0, width]);
+const yScale = d3.scaleLinear().range([height, 0]);
 
-let drawBars = () => {
-  let tooltip = d3
-    .select("body")
-    .append("div")
-    .attr("id", "tooltip")
-    .style("visibility", "hidden")
-    .style("width", "auto")
-    .style("height", "auto");
+// Define a parse function to parse dates from dataset
+const parseTime = d3.timeParse("%Y-%m-%d"); //converst time to Date object
+const formatTime = d3.timeFormat("%Y-%m-%d"); //converst date Object to string
 
-  svg
-    .selectAll("rect")
-    .data(values) // associate data array with all rectangle values
-    .enter() // for each data value that does not have a rectangle
-    .append("rect") // create a rectangle
-    .attr("class", "bar")
-    .attr("height", 0)
-    .attr("width", (width - 2 * padding) / values.length)
-    .attr("data-date", (item) => item[0])
-    .attr("data-gdp", (item) => item[1])
-    .attr("height", (item) => heightScale(item[1]))
-    .attr("x", (item, index) => {
-      return xScale(index);
-    })
-    .attr("y", (item) => height - padding - heightScale(item[1]))
-    .on("mouseover", (item) => {
-      tooltip.transition().style("visibility", "visible");
-      tooltip.text(item[0]);
-      document.querySelector("#tooltip").setAttribute("data-date", item[0]);
-    })
-    .on("mouseout", (item) => {
-      tooltip.transition().style("visibilty", "hidden");
-    });
-};
-
-let generateAxes = () => {
-  let xAxis = d3.axisBottom(xAxisScale);
-  let yAxis = d3.axisLeft(yAxisScale);
-
-  svg
-    .append("g")
-    .call(xAxis)
-    .attr("id", "x-axis")
-    .attr("transform", "translate(0," + (height - padding) + ")");
-
-  svg
-    .append("g")
-    .call(yAxis)
-    .attr("id", "y-axis")
-    .attr("transform", "translate(" + padding + ",0)");
-};
-
-let update = () => {
-  d3.selectAll(".bar")
-    .attr("fill", "black")
-    .transition()
-    .duration(5000)
-    .attr("fill", "green");
-};
+/** DATA
+ * Retrieve data with d3.json and call drawBarChart function
+ * Define a function which draws the data visualization based on the data array
+ * plot the chart by including rectangle elements in the SVG in the established area
+ * include a tooltip through a div (the tooltip should appear on the basis of the mouseenter and mouseout events, on the rectangle elements)
+ */
 
 d3.json("/data.json").then(function (data) {
-  console.log("data", data.data);
-  values = data.data;
-  drawCanvas();
-  generateScales();
-  drawBars();
-  generateAxes();
-  update();
+  dataset = data.data;
+  drawBarChart(dataset);
 });
+
+function drawBarChart(data) {
+  /**
+   * data is an array containing 275+ arrays
+   * each data[i] array nests a two dimensional array
+   * d[i][0] contains information regarding the date of the GDP measurement
+   * d[i][1] contains information regarding the value of the GDP
+   */
+
+  // format data
+  data.forEach((d) => {
+    d[0] = parseTime(d[0]);
+    d[1] = +d[1];
+  });
+
+  // set domain
+  xScale.domain(d3.extent(data, (d) => d[0]));
+  yScale.domain(d3.extent(data, (d) => d[1])).nice();
+
+  // draw axes
+  const xAxis = d3.axisBottom(xScale);
+  const yAxis = d3.axisLeft(yScale);
+
+  canvasContents
+    .append("g")
+    .attr("id", "x-axis")
+    .attr("transform", `translate(0,${height})`)
+    .call(xAxis);
+
+  canvasContents.append("g").attr("id", "y-axis").call(yAxis);
+
+  //create tooltip
+  const tooltip = container.append("div").attr("id", "tooltip");
+
+  //plot chart
+  canvasContents
+    .selectAll("rect")
+    .data(data)
+    .enter()
+    .append("rect")
+    .on("mouseenter", (data) => {
+      barData = data.target.__data__;
+      tooltip
+        .style("opacity", 1)
+        .style("left", `${data.layerX - 100}px`)
+        .style("top", `${data.layerY - 40}px`)
+        .attr("data-date", formatTime(barData[0]))
+        .text(() => {
+          let year = barData[0].getFullYear();
+          let quarter =
+            barData[0].getMonth() == 0
+              ? "Q1"
+              : barData[0].getMonth() == 3
+              ? "Q2"
+              : barData[0].getMonth() == 6
+              ? "Q3"
+              : "Q4";
+
+          return `${year} ${quarter} ${barData[1]}`;
+        });
+    })
+    .on("mouseout", () => {
+      tooltip.style("opacity", 0);
+    })
+    .attr("data-date", (d) => formatTime(d[0]))
+    .attr("data-gdp", (d) => d[1])
+    .attr("x", (d, i) => (width / data.length) * i)
+    .attr("width", width / data.length)
+    .attr("y", (d) => yScale(d[1]))
+    .attr("height", (d) => height - yScale(d[1]))
+    .attr("class", "bar");
+}
