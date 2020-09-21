@@ -8,8 +8,8 @@ body {
   min-height: 100vh;
   width: 100%;
   font-family: "Lato", sans-serif;
-  color: #eee;
-  background: #252525;
+  color: #ebf2fa;
+  background: #05668d;
 }
 
 .container {
@@ -21,6 +21,8 @@ body {
   margin: 2rem auto;
   color: #252525;
   background: whitesmoke;
+  border: 20px solid #03394f;
+  border-radius: 10px;
 }
 .container h1#title {
   font-size: 2.5rem;
@@ -29,7 +31,7 @@ body {
   margin: 1rem;
 }
 .container h1#title::selection {
-  color: #eee;
+  color: #1f2d10;
   background: #252525;
 }
 
@@ -40,17 +42,17 @@ body {
 }
 /* change the opacity of the fill on hover */
 .container svg .bar {
-  fill: rgba(58, 49, 38, 0.7);
+  fill: #1f2d10;
 }
 .container svg .bar:hover {
-  fill: orange;
+  fill: #a5be00;
 }
 .container div#tooltip {
   /* absolute position the div used as tooltip, to change the left and bottom properties as the cursor hovers on the SVG rectangles */
   position: absolute;
-  border-radius: 4px;
-  color: black;
-  background: orange;
+  color: #344b1b;
+  background: #a5be00;
+  border: 2px solid #344b1b;
   padding: 1rem 2rem;
   font-size: 1.5rem;
   font-weight: bold;

@@ -6,8 +6,6 @@
  */
 
 // SETUP
-let url =
-  "https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/master/GDP-data.json";
 
 let svg = d3.select("svg");
 let container = d3.select(".container");
@@ -51,7 +49,7 @@ const formatTime = d3.timeFormat("%Y-%m-%d"); //converst date Object to string
  * include a tooltip through a div (the tooltip should appear on the basis of the mouseenter and mouseout events, on the rectangle elements)
  */
 
-d3.json("/data.json").then(function (data) {
+d3.json("data.json").then(function (data) {
   dataset = data.data;
   drawBarChart(dataset);
 });
