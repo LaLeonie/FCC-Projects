@@ -119,11 +119,11 @@ function drawBarChart(data) {
     .on("mouseout", () => {
       tooltip.style("opacity", 0);
     })
+    .attr("class", "bar")
     .attr("data-date", (d) => formatTime(d[0]))
     .attr("data-gdp", (d) => d[1])
-    .attr("x", (d, i) => (width / data.length) * i)
+    .attr("x", (d) => xScale(new Date(d[0])))
     .attr("width", width / data.length)
     .attr("y", (d) => yScale(d[1]))
-    .attr("height", (d) => height - yScale(d[1]))
-    .attr("class", "bar");
+    .attr("height", (d) => height - yScale(d[1]));
 }
