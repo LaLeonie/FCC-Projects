@@ -45,6 +45,30 @@ svg {
   fill: #234157;
 }
 
+.container div#tooltip {
+  position: absolute;
+  z-index: 5;
+  color: #234157;
+  background: #d8f3fe;
+  border: 2px solid #05668d;
+  padding: 0.2rem 0.4rem;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease-out;
+}
+
+.container div#tooltip h3 {
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.container div#tooltip h4 {
+  font-size: 0.6rem;
+}
+.container div#tooltip p {
+  font-size: 0.6rem;
+}
+
 #subtitle {
   text-anchor: middle;
   font-size: 1rem;
@@ -55,27 +79,3 @@ svg {
 .container svg text {
   font-family: "Lato", sans-serif;
   font-weight: bold;
-}
-/* change the opacity of the fill on hover */
-.container svg .bar {
-  fill: #1f2d10;
-}
-.container svg .bar:hover {
-  fill: #a5be00;
-}
-.container div#tooltip {
-  /* absolute position the div used as tooltip, to change the left and bottom properties as the cursor hovers on the SVG rectangles */
-  position: absolute;
-  color: #344b1b;
-  background: #a5be00;
-  border: 2px solid #344b1b;
-  padding: 1rem 2rem;
-  font-size: 1.5rem;
-  font-weight: bold;
-  /* pointer events to avoid hovering on the tooltip and preventing the hover state on the rectangle elements behind it */
-  pointer-events: none;
-  /* set opacity to 0 and change it to 1 on hover on the rectangle elements */
-  opacity: 0;
-  /* transition to smoothen the change in opacity  */
-  transition: opacity 0.2s ease-out;
-}

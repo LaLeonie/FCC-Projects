@@ -5,7 +5,7 @@
  */
 
 let svg = d3.select("svg");
-let container = d3.select("container");
+let container = d3.select(".container");
 
 const width = 800;
 const height = 400;
@@ -45,35 +45,31 @@ const timeToMinAndSec = d3.timeFormat("%M:%S");
 let url =
   "https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/master/cyclist-data.json";
 d3.json(url).then((data) => {
-  let dataset = [];
-  data.map((d) => dataset.push([d.Time, d.Seconds, d.Year, d.Doping]));
-  drawChart(dataset);
+  data.forEach((d) => {
+    d.Seconds = new Date(d.Seconds * 1000);
+    d.URL = d.URL == "" ? false : true;
+  });
+  drawChart(data);
 });
 
-let drawChart = (dataArray) => {
-  /**
-   * data is an array containing 275+ arrays
-   * each data[i] array nests a three dimensional array
-   * d[i][0] contains information regarding time in min:sec format
-   * d[i][1] contains information regarding time in sec format
-   * d[i][2] contains information about the year
+let drawChart = (dataObj) => {
+  /** DATA FORMAT
+  Time: "37:15",
+  Place: 3,
+  Seconds: 2235,
+  Name: "Marco Pantani",
+  Year: 1994,
+  Nationality: "ITA",
+  Doping: "Alleged drug use during 1994 due to high hermatocrit levels",
+  URL: "https://en.wikipedia.org/wiki/Marco_Pantani#Alleged_drug_use"
    */
-
-  // format data
-  dataArray.forEach((d) => {
-    d[0] = parseTime(d[0]);
-    d[1] = new Date(d[1] * 1000);
-    d[2] = d[2];
-    d[3] = d[3] == "" ? false : true;
-  });
-  console.log(dataArray);
 
   //set domain
   xScale.domain([
-    d3.min(dataArray, (d) => d[2]) - 1,
-    d3.max(dataArray, (d) => d[2]) + 1,
+    d3.min(dataObj, (d) => d.Year) - 1,
+    d3.max(dataObj, (d) => d.Year) + 1,
   ]);
-  yScale.domain(d3.extent(dataArray, (d) => d[1]));
+  yScale.domain(d3.extent(dataObj, (d) => d.Seconds));
 
   //draw axis
   const xAxis = d3.axisBottom(xScale).tickFormat(d3.format("d"));
@@ -87,21 +83,37 @@ let drawChart = (dataArray) => {
     .call(xAxis);
 
   canvasContent.append("g").attr("id", "y-axis").call(yAxis);
+  const tooltip = container.append("div").attr("id", "tooltip");
 
   //draw points
   canvasContent
     .selectAll("circle")
-    .data(dataArray)
+    .data(dataObj)
     .enter()
     .append("circle")
     .attr("class", "dot")
     .attr("r", "5")
-    .attr("data-xvalue", (d) => d[2])
-    .attr("data-yvalue", (d) => d[1])
-    .attr("cx", (d, i) => xScale(d[2]))
-    .attr("cy", (d) => yScale(d[1]))
+    .attr("data-xvalue", (d) => d.Year)
+    .attr("data-yvalue", (d) => d.Seconds)
+    .attr("cx", (d) => xScale(d.Year))
+    .attr("cy", (d) => yScale(d.Seconds))
     .attr("fill", (d) => {
-      return d[3] == false ? colors[0] : colors[1];
+      return d.URL == false ? colors[0] : colors[1];
+    })
+    .on("mouseover", (d) => {
+      let data = d.target.__data__;
+      console.log(d);
+      tooltip
+        .style("opacity", "1")
+        .style("left", `${d.layerX + 10}px`)
+        .style("top", `${d.layerY - 50}px`)
+        .attr("data-year", data.Year)
+        .html(() => {
+          return `<h3>${data.Name}</h3><h4>Year: ${data.Year}, Time: ${data.Time} </h4><p>${data.Doping}</p>`;
+        });
+    })
+    .on("mouseout", () => {
+      d3.select("#tooltip").style("opacity", "0");
     });
 
   // Add label to axis
