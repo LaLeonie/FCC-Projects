@@ -68,13 +68,11 @@ let drawChart = (dataArray) => {
 
   //set domain
   xScale.domain(d3.extent(dataArray, (d) => d[2]));
-  yScale.domain(d3.extent(dataArray, (d) => d[0])).tickFormat(function (d, i) {
-    return data[i];
-  });
+  yScale.domain(d3.extent(dataArray, (d) => d[1]));
 
   //draw axis
   const xAxis = d3.axisBottom(xScale).tickFormat(d3.format("d"));
-  const yAxis = d3.axisLeft(yScale);
+  const yAxis = d3.axisLeft(yScale).tickFormat(d3.timeFormat("%M:%S"));
 
   canvasContent
     .append("g")
@@ -94,5 +92,6 @@ let drawChart = (dataArray) => {
     .attr("r", "5")
     .attr("data-xvalue", (d) => d[2])
     .attr("data-yvalue", (d) => d[1])
-    .attr("cx", (d, i) => xScale(d[2]));
+    .attr("cx", (d, i) => xScale(d[2]))
+    .attr("cy", (d) => yScale(d[1]));
 };
