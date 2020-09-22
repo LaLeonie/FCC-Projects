@@ -35,6 +35,10 @@ body {
   background: #252525;
 }
 
+svg {
+  margin: 60px 0 0 0;
+}
+
 #title {
   text-anchor: middle;
   font-size: 1.4rem;
